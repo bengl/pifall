@@ -1,0 +1,26 @@
+{
+  "name": "pifall",
+  "version": "1.0.0",
+  "description": "promisifyAll implemented with util.promisify",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/bengl/pifall.git"
+  },
+  "keywords": [
+    "promisify",
+    "promisifyAll",
+    "promise"
+  ],
+  "author": "Bryan English <bryan@bryanenglish.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "devDependencies": {
+    "pitesti": "^2.2.0"
+  }
+}
