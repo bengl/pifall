@@ -2,7 +2,31 @@
 
 const { promisify } = require('util');
 
-function promisifyAll(obj) {
+// As a bit of a safety net, don't promisifyAll any built-in prototypes.
+const builtInPrototypes = Reflect.ownKeys(global).map(k => {
+  if (k === 'GLOBAL' || k === 'root') {
+    // avoid deprecation warnings
+    return false;
+  }
+  const obj = global[k];
+  if (
+    typeof k === 'string' &&
+    typeof obj === 'function' &&
+    k.toUpperCase()[0] === k[0]
+  ) {
+    return obj.prototype;
+  } else {
+    return false;
+  }
+}).filter(x => !!x);
+
+function promisifyAll(obj, options = {}) {
+  if (!obj || (typeof obj !== 'object' && typeof obj !== 'function')) {
+    throw new TypeError('Cannot pifall non-object');
+  }
+  if (builtInPrototypes.includes(obj)) {
+    throw new TypeError('Cannot pifall built-in prototype');
+  }
   const keys = Reflect.ownKeys(obj);
   for (const k of keys) {
     if (typeof k === 'symbol') {
@@ -40,6 +64,16 @@ function promisifyAll(obj) {
           }
         }));
       }
+    }
+  }
+  if (options.proto) {
+    const proto = Reflect.getPrototypeOf(obj);
+    if (
+      proto &&
+      (typeof proto === 'object' || typeof proto === 'function') &&
+      !builtInPrototypes.includes(proto)
+    ) {
+      promisifyAll(proto, options);
     }
   }
 }

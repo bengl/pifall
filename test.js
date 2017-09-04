@@ -16,7 +16,14 @@ const obj = {
   },
 };
 
+const objWithProto = {
+  __proto__: {
+    foo: cb => setImmediate(() => {cb(null, 'hello')})
+  }
+};
+
 pifall(obj);
+pifall(objWithProto, { proto: true });
 
 const test = pitesti();
 
@@ -37,6 +44,36 @@ test`non-func getter`(() => {
   assert.throws(() => {
     obj.bazAsync();
   }, /^TypeError: called Async suffix on non-function getter$/);
+});
+
+test`prototype is promisified`(() => objWithProto.fooAsync().then(result => {
+  assert.equal(result, 'hello');
+}));
+
+test`non-obj/func fails to be promisified`(() => {
+  [
+    null,
+    5,
+    true,
+    'hello',
+    Symbol()
+  ].forEach(obj => {
+    assert.throws(() => pifall(obj),
+    /^TypeError: Cannot pifall non-object$/);
+  });
+
+});
+
+Reflect.ownKeys(global).filter(k =>
+  typeof k === 'string' &&
+  k !== 'Proxy' && // ugh special case
+  k.toUpperCase()[0] === k[0] &&
+  typeof global[k] === 'function'
+).forEach(k => {
+  test`don't promisify built-in ${k}.prototype`(() => {
+    assert.throws(() => pifall(global[k].prototype),
+      /^TypeError: Cannot pifall built-in prototype$/);
+  });
 });
 
 test();
