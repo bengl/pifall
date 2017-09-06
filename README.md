@@ -1,5 +1,7 @@
 # pifall
 
+[![Build Status](https://travis-ci.org/bengl/pifall.svg?branch=master)](https://travis-ci.org/bengl/pifall)
+
 **`pifall`** is an implementation of `promisifyAll` in terms of Node 8's
 included [`util.promisify`](https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_promisify_original).
 
