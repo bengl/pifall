@@ -20,8 +20,28 @@ const builtInPrototypes = Reflect.ownKeys(global).map(k => {
   }
 }).filter(x => !!x);
 
+function isObjectish(obj) {
+  return typeof obj === 'object' || typeof obj === 'function';
+}
+
+function maybePromisifyClass(fn, options) {
+  // We'd use k instead of fn.name, but it's simpler to use fn.name
+  if (
+    options.classes &&
+    fn.name && // sometimes it's namelss!
+    fn.name[0] === fn.name[0].toUpperCase() && // upper-case first character
+    fn.prototype && // has a truthy prototype
+    isObjectish(fn.prototype) // no bizarre prototypes
+  ) {
+    promisifyAll(fn.prototype);
+    // won't promisify the function itself, because it's a class
+    return true; // tell the caller we don't need to make a suffix copy
+  }
+}
+
+
 function promisifyAll(obj, options = {}) {
-  if (!obj || (typeof obj !== 'object' && typeof obj !== 'function')) {
+  if (!obj || (!isObjectish(obj))) {
     throw new TypeError('Cannot pifall non-object');
   }
   if (builtInPrototypes.includes(obj)) {
@@ -39,9 +59,12 @@ function promisifyAll(obj, options = {}) {
     const desc = Reflect.getOwnPropertyDescriptor(obj, k);
     const fn = desc.value;
     if (fn) {
-      // Yay! It's a normal property. No shenanigans. Just assign it.
       if (typeof fn === 'function') {
-        obj[k + 'Async'] = promisify(fn);
+        // If it's a class, promisify its prototype.
+        if (!maybePromisifyClass(fn, options)) {
+          // It's a normal function property. No shenanigans. Just assign it.
+          obj[k + 'Async'] = promisify(fn);
+        }
       }
     } else {
       // Accessors.
@@ -70,7 +93,7 @@ function promisifyAll(obj, options = {}) {
     const proto = Reflect.getPrototypeOf(obj);
     if (
       proto &&
-      (typeof proto === 'object' || typeof proto === 'function') &&
+      isObjectish(proto) &&
       !builtInPrototypes.includes(proto)
     ) {
       promisifyAll(proto, options);

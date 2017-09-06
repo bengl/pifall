@@ -61,7 +61,6 @@ test`non-obj/func fails to be promisified`(() => {
     assert.throws(() => pifall(obj),
       /^TypeError: Cannot pifall non-object$/);
   });
-
 });
 
 Reflect.ownKeys(global).filter(k =>
@@ -75,6 +74,33 @@ Reflect.ownKeys(global).filter(k =>
   test`don't promisify built-in ${k}.prototype`(() => {
     assert.throws(() => pifall(global[k].prototype),
       /^TypeError: Cannot pifall built-in prototype$/);
+  });
+});
+
+test`class is promisified`(() => {
+  class Foo {
+    bar(cb) {
+      setImmediate(() => {cb(null, 'barbar')})
+    }
+  }
+  class Foo2 {
+    bar(cb) {
+      setImmediate(() => {cb(null, 'barbar')})
+    }
+  }
+
+  const obj = { Foo };
+  pifall(obj);
+  assert.equal(typeof obj.FooAsync, 'function');
+  assert.notEqual(typeof obj.Foo.prototype.barAsync, 'function');
+  const anotherObj = { Foo: Foo2 };
+  debugger;
+  pifall(anotherObj, { classes: true });
+  assert.notEqual(typeof anotherObj.FooAsync, 'function');
+  assert.equal(typeof anotherObj.Foo.prototype.barAsync, 'function');
+  const f = new anotherObj.Foo();
+  return f.barAsync().then(result => {
+    assert.equal(result, 'barbar');
   });
 });
 

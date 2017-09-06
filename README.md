@@ -40,9 +40,17 @@ require('pifall')(obj);
 obj.funcAsync().then(result => console.assert(result === 'hello'));
 ```
 
-It can also take a second parameter, an optional options object, currently
-supporting one property `proto`. If truthy, this causes `pifall` to include any
-properties accessible on the object, including those in its prototype chain.
+It can also take a second parameter, an optional options object, with the
+following properties:
+
+* **`proto`**: If truthy, this causes `pifall` to include any properties
+accessible on the object, including those in its prototype chain.
+* **`classes`**: If truthy, this causes `pifall` to treat functions whose names
+start with a capital letter as "classes". That is, the function itself will not
+be promisified, but its prototype will be `pifall`ed. (*Note: This does not
+currently work for functions retrieved via getters. No matter what, these are
+treated as ordinary non-class functions. In practice, this doesn't come up a
+whole lot.*)
 
 ### License
 
