@@ -59,7 +59,7 @@ test`non-obj/func fails to be promisified`(() => {
     Symbol()
   ].forEach(obj => {
     assert.throws(() => pifall(obj),
-    /^TypeError: Cannot pifall non-object$/);
+      /^TypeError: Cannot pifall non-object$/);
   });
 
 });
@@ -67,6 +67,8 @@ test`non-obj/func fails to be promisified`(() => {
 Reflect.ownKeys(global).filter(k =>
   typeof k === 'string' &&
   k !== 'Proxy' && // ugh special case
+  k !== 'GLOBAL' && // deprecation
+  k !== 'root' && // deprecation
   k.toUpperCase()[0] === k[0] &&
   typeof global[k] === 'function'
 ).forEach(k => {
