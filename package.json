@@ -10,6 +10,7 @@
     "type": "git",
     "url": "git@github.com/bengl/pifall.git"
   },
+  "homepage": "https://github.com/bengl/pifall",
   "keywords": [
     "promisify",
     "promisifyAll",
