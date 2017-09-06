@@ -104,4 +104,14 @@ test`class is promisified`(() => {
   });
 });
 
+test`different suffix`(() => {
+  const aObj = {
+    foo: cb => setImmediate(() => {cb(null, 'hello')})
+  };
+  pifall(aObj, { suffix: 'Asink' });
+  return aObj.fooAsink().then(result => {
+    assert.equal(result, 'hello');
+  });
+});
+
 test();

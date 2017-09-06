@@ -47,6 +47,7 @@ function promisifyAll(obj, options = {}) {
   if (builtInPrototypes.includes(obj)) {
     throw new TypeError('Cannot pifall built-in prototype');
   }
+  const suffix = options.suffix || 'Async';
   const keys = Reflect.ownKeys(obj);
   for (const k of keys) {
     if (typeof k === 'symbol') {
@@ -63,7 +64,7 @@ function promisifyAll(obj, options = {}) {
         // If it's a class, promisify its prototype.
         if (!maybePromisifyClass(fn, options)) {
           // It's a normal function property. No shenanigans. Just assign it.
-          obj[k + 'Async'] = promisify(fn);
+          obj[k + suffix] = promisify(fn);
         }
       }
     } else {
@@ -76,7 +77,7 @@ function promisifyAll(obj, options = {}) {
         //
         // We're setting the new descriptor to be the same as the old, but with
         // our own getter. This maintains writable, etc.
-        Reflect.defineProperty(obj, k + 'Async', Object.assign({}, desc, {
+        Reflect.defineProperty(obj, k + suffix, Object.assign({}, desc, {
           get () {
             const result = desc.get.apply(this);
             if (typeof result === 'function') {
