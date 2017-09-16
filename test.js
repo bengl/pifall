@@ -14,6 +14,12 @@ const obj = {
   get baz() {
     return 5;
   },
+  set bop (x) {
+    // When iterating over this, we should get nothing.
+  },
+  [Symbol()]() {
+    // noop
+  }
 };
 
 const objWithProto = {
@@ -36,6 +42,10 @@ test`normal func`(() => obj.fooAsync().then(result => {
   assert.equal(result, 'hello');
 }));
 
+test`setter`(() => {
+  assert(!Reflect.getOwnPropertyDescriptor(obj, 'bopAsync'));
+});
+
 test`getter func`(() => obj.barAsync().then(result => {
   assert.equal(result, 'barbar');
 }));
@@ -44,6 +54,11 @@ test`non-func getter`(() => {
   assert.throws(() => {
     obj.bazAsync();
   }, /^TypeError: called Async suffix on non-function getter$/);
+});
+
+test`object has correct number of properties`(() => {
+  // also tests that symbol was ignored
+  assert.equal(Reflect.ownKeys(obj).length, 10);
 });
 
 test`prototype is promisified`(() => objWithProto.fooAsync().then(result => {

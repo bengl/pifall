@@ -1,6 +1,8 @@
 'use strict';
 
 const { promisify } = require('util');
+const is = ([type]) => x => typeof x === type;
+const isObjectish = obj => is`object`(obj) || is`function`(obj);
 
 // As a bit of a safety net, don't promisifyAll any built-in prototypes.
 const builtInPrototypes = Reflect.ownKeys(global).map(k => {
@@ -10,8 +12,8 @@ const builtInPrototypes = Reflect.ownKeys(global).map(k => {
   }
   const obj = global[k];
   if (
-    typeof k === 'string' &&
-    typeof obj === 'function' &&
+    is`string`(k) &&
+    is`function`(obj) &&
     k.toUpperCase()[0] === k[0]
   ) {
     return obj.prototype;
@@ -19,10 +21,6 @@ const builtInPrototypes = Reflect.ownKeys(global).map(k => {
     return false;
   }
 }).filter(x => !!x);
-
-function isObjectish(obj) {
-  return typeof obj === 'object' || typeof obj === 'function';
-}
 
 function maybePromisifyClass(fn, options) {
   // We'd use k instead of fn.name, but it's simpler to use fn.name
@@ -50,7 +48,7 @@ function promisifyAll(obj, options = {}) {
   const suffix = options.suffix || 'Async';
   const keys = Reflect.ownKeys(obj);
   for (const k of keys) {
-    if (typeof k === 'symbol') {
+    if (is`symbol`(k)) {
       // Symbols are ignored, since referring to them by name isn't a thing.
       // We could grab the string and make a new symbol whose name has the
       // suffix, but that doesn't make a whole lot of sense unless you iterate
@@ -60,7 +58,7 @@ function promisifyAll(obj, options = {}) {
     const desc = Reflect.getOwnPropertyDescriptor(obj, k);
     const fn = desc.value;
     if (fn) {
-      if (typeof fn === 'function') {
+      if (is`function`(fn)) {
         // If it's a class, promisify its prototype.
         if (!maybePromisifyClass(fn, options)) {
           // It's a normal function property. No shenanigans. Just assign it.
@@ -80,7 +78,7 @@ function promisifyAll(obj, options = {}) {
         Reflect.defineProperty(obj, k + suffix, Object.assign({}, desc, {
           get () {
             const result = desc.get.apply(this);
-            if (typeof result === 'function') {
+            if (is`function`(result)) {
               return promisify(result);
             } else {
               throw new TypeError('called Async suffix on non-function getter');
