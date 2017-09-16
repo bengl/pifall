@@ -4,7 +4,7 @@
   "description": "promisifyAll implemented with util.promisify",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "test": "nyc --check-coverage --lines 100 --branches 100 --functions 100 --statements 100 node test.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
     "node": ">=8.0.0"
   },
   "devDependencies": {
+    "nyc": "^11.2.1",
     "pitesti": "^2.2.0"
   }
 }
