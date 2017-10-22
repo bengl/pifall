@@ -98,6 +98,7 @@ function promisifyAll(obj, options = {}) {
       promisifyAll(proto, options);
     }
   }
+  return obj;
 }
 
 module.exports = promisifyAll;

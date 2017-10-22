@@ -28,10 +28,14 @@ const objWithProto = {
   }
 };
 
-pifall(obj);
+const returnedObj = pifall(obj);
 pifall(objWithProto, { proto: true });
 
 const test = pitesti();
+
+test`returns the input object`(() => {
+  assert.strictEqual(returnedObj, obj);
+});
 
 test`non-funcs aren't processed`(() => {
   assert(!('xAsync' in obj));
