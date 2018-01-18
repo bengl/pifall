@@ -1,6 +1,6 @@
 'use strict';
 
-const { promisify } = require('util');
+const promisify = require('util.promisify');
 const is = ([type]) => x => typeof x === type;
 const isObjectish = obj => is`object`(obj) || is`function`(obj);
 

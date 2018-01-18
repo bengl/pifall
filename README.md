@@ -25,6 +25,8 @@ a prototype chain when the `proto` option is provided. It will also flat-out
 refuse to promisify objects whose `typeof` is not `function` or `object`. It
 will do this by throwing a `TypeError`.
 
+On versions of Node not supporting `util.promisify`, a polyfill is used.
+
 ### Usage
 
 Example:

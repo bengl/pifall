@@ -19,10 +19,13 @@
   "author": "Bryan English <bryan@bryanenglish.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=6.0.0"
   },
   "devDependencies": {
     "nyc": "^11.2.1",
     "pitesti": "^2.2.0"
+  },
+  "dependencies": {
+    "util.promisify": "^1.0.0"
   }
 }
