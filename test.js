@@ -133,4 +133,30 @@ test`different suffix`(() => {
   });
 });
 
+test`custom promisifier`(() => {
+  let called = false;
+  const promisifier = (func) => {
+    return (...args) => {
+      called = true;
+      return new Promise((resolve, reject) => {
+        func(...args, (err, out) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(out);
+          }
+        })
+      });
+    } 
+  };
+  const aObj = {
+    foo: cb => setImmediate(() => {cb(null, 'hello')})
+  };
+  pifall(aObj, { promisifier });
+  return aObj.fooAsync().then(result => {
+    assert.equal(result, 'hello');
+    assert.equal(called, true);
+  });
+});
+
 test();
