@@ -46,6 +46,7 @@ function promisifyAll(obj, options = {}) {
     throw new TypeError('Cannot pifall built-in prototype');
   }
   const suffix = options.suffix || 'Async';
+  const promisifier = options.promisifier || promisify;
   const keys = Reflect.ownKeys(obj);
   for (const k of keys) {
     if (is`symbol`(k)) {
@@ -62,7 +63,7 @@ function promisifyAll(obj, options = {}) {
         // If it's a class, promisify its prototype.
         if (!maybePromisifyClass(fn, options)) {
           // It's a normal function property. No shenanigans. Just assign it.
-          obj[k + suffix] = promisify(fn);
+          obj[k + suffix] = promisifier(fn);
         }
       }
     } else {
@@ -79,7 +80,7 @@ function promisifyAll(obj, options = {}) {
           get () {
             const result = desc.get.apply(this);
             if (is`function`(result)) {
-              return promisify(result);
+              return promisifier(result);
             } else {
               throw new TypeError('called Async suffix on non-function getter');
             }
