@@ -58,6 +58,7 @@ treated as ordinary non-class functions. In practice, this doesn't come up a
 whole lot.*) Default is false.
 * **`suffix`**: Sets the suffix for promisified versions of functions. Default
 is `'Async'`.
+* **`promisifier`**: Use custom promisifier instead of `util.promisify`
 
 ### License
 
