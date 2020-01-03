@@ -1,6 +1,7 @@
 'use strict';
 
 const promisify = require('util.promisify');
+// eslint-disable-next-line valid-typeof
 const is = ([type]) => x => typeof x === type;
 const isObjectish = obj => is`object`(obj) || is`function`(obj);
 
@@ -22,7 +23,7 @@ const builtInPrototypes = Reflect.ownKeys(global).map(k => {
   }
 }).filter(x => !!x);
 
-function maybePromisifyClass(fn, options) {
+function maybePromisifyClass (fn, options) {
   // We'd use k instead of fn.name, but it's simpler to use fn.name
   if (
     options.classes &&
@@ -37,8 +38,7 @@ function maybePromisifyClass(fn, options) {
   }
 }
 
-
-function promisifyAll(obj, options = {}) {
+function promisifyAll (obj, options = {}) {
   if (!obj || (!isObjectish(obj))) {
     throw new TypeError('Cannot pifall non-object');
   }

@@ -7,24 +7,24 @@ const pifall = require('./index');
 const obj = {
   x: 1,
   y: 2,
-  foo: cb => setImmediate(() => {cb(null, 'hello')}),
-  get bar() {
-    return cb => setImmediate(() => {cb(null, 'barbar')})
+  foo: cb => setImmediate(() => { cb(null, 'hello'); }),
+  get bar () {
+    return cb => setImmediate(() => { cb(null, 'barbar'); });
   },
-  get baz() {
+  get baz () {
     return 5;
   },
-  set bop (x) {
+  set bop (x) { // eslint-disable-line accessor-pairs
     // When iterating over this, we should get nothing.
   },
-  [Symbol()]() {
+  [Symbol('bonk')] () {
     // noop
   }
 };
 
 const objWithProto = {
   __proto__: {
-    foo: cb => setImmediate(() => {cb(null, 'hello')})
+    foo: cb => setImmediate(() => { cb(null, 'hello'); })
   }
 };
 
@@ -43,7 +43,7 @@ test`non-funcs aren't processed`(() => {
 });
 
 test`normal func`(() => obj.fooAsync().then(result => {
-  assert.equal(result, 'hello');
+  assert.strictEqual(result, 'hello');
 }));
 
 test`setter`(() => {
@@ -51,7 +51,7 @@ test`setter`(() => {
 });
 
 test`getter func`(() => obj.barAsync().then(result => {
-  assert.equal(result, 'barbar');
+  assert.strictEqual(result, 'barbar');
 }));
 
 test`non-func getter`(() => {
@@ -62,11 +62,11 @@ test`non-func getter`(() => {
 
 test`object has correct number of properties`(() => {
   // also tests that symbol was ignored
-  assert.equal(Reflect.ownKeys(obj).length, 10);
+  assert.strictEqual(Reflect.ownKeys(obj).length, 10);
 });
 
 test`prototype is promisified`(() => objWithProto.fooAsync().then(result => {
-  assert.equal(result, 'hello');
+  assert.strictEqual(result, 'hello');
 }));
 
 test`non-obj/func fails to be promisified`(() => {
@@ -75,7 +75,7 @@ test`non-obj/func fails to be promisified`(() => {
     5,
     true,
     'hello',
-    Symbol()
+    Symbol('bonk')
   ].forEach(obj => {
     assert.throws(() => pifall(obj),
       /^TypeError: Cannot pifall non-object$/);
@@ -98,37 +98,37 @@ Reflect.ownKeys(global).filter(k =>
 
 test`class is promisified`(() => {
   class Foo {
-    bar(cb) {
-      setImmediate(() => {cb(null, 'barbar')})
+    bar (cb) {
+      setImmediate(() => { cb(null, 'barbar'); });
     }
   }
   class Foo2 {
-    bar(cb) {
-      setImmediate(() => {cb(null, 'barbar')})
+    bar (cb) {
+      setImmediate(() => { cb(null, 'barbar'); });
     }
   }
 
   const obj = { Foo };
   pifall(obj);
-  assert.equal(typeof obj.FooAsync, 'function');
-  assert.notEqual(typeof obj.Foo.prototype.barAsync, 'function');
+  assert.strictEqual(typeof obj.FooAsync, 'function');
+  assert.notStrictEqual(typeof obj.Foo.prototype.barAsync, 'function');
   const anotherObj = { Foo: Foo2 };
   pifall(anotherObj, { classes: true });
-  assert.notEqual(typeof anotherObj.FooAsync, 'function');
-  assert.equal(typeof anotherObj.Foo.prototype.barAsync, 'function');
+  assert.notStrictEqual(typeof anotherObj.FooAsync, 'function');
+  assert.strictEqual(typeof anotherObj.Foo.prototype.barAsync, 'function');
   const f = new anotherObj.Foo();
   return f.barAsync().then(result => {
-    assert.equal(result, 'barbar');
+    assert.strictEqual(result, 'barbar');
   });
 });
 
 test`different suffix`(() => {
   const aObj = {
-    foo: cb => setImmediate(() => {cb(null, 'hello')})
+    foo: cb => setImmediate(() => { cb(null, 'hello'); })
   };
   pifall(aObj, { suffix: 'Asink' });
   return aObj.fooAsink().then(result => {
-    assert.equal(result, 'hello');
+    assert.strictEqual(result, 'hello');
   });
 });
 
@@ -144,17 +144,17 @@ test`custom promisifier`(() => {
           } else {
             resolve(out);
           }
-        })
+        });
       });
-    } 
+    };
   };
   const aObj = {
-    foo: cb => setImmediate(() => {cb(null, 'hello')})
+    foo: cb => setImmediate(() => { cb(null, 'hello'); })
   };
   pifall(aObj, { promisifier });
   return aObj.fooAsync().then(result => {
-    assert.equal(result, 'hello');
-    assert.equal(called, true);
+    assert.strictEqual(result, 'hello');
+    assert.strictEqual(called, true);
   });
 });
 
