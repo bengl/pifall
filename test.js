@@ -113,7 +113,6 @@ test`class is promisified`(() => {
   assert.equal(typeof obj.FooAsync, 'function');
   assert.notEqual(typeof obj.Foo.prototype.barAsync, 'function');
   const anotherObj = { Foo: Foo2 };
-  debugger;
   pifall(anotherObj, { classes: true });
   assert.notEqual(typeof anotherObj.FooAsync, 'function');
   assert.equal(typeof anotherObj.Foo.prototype.barAsync, 'function');
