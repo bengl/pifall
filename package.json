@@ -22,7 +22,7 @@
     "node": ">=6.0.0"
   },
   "devDependencies": {
-    "nyc": "^11.2.1",
+    "nyc": "^15.0.0",
     "pitesti": "^2.2.0"
   },
   "dependencies": {
